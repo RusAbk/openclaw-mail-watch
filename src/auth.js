@@ -158,7 +158,8 @@ async function addAccountWizard() {
             });
             await client.connect();
             const mailboxes = [];
-            for await (const box of client.list()) {
+            const list = await client.list();
+            for (const box of list) {
                 mailboxes.push(box.name);
             }
             await client.logout();
