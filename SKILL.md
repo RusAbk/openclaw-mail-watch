@@ -1,6 +1,6 @@
 # Mail Watch — OpenClaw Skill
 
-Monitor multiple email accounts (Gmail via OAuth, IMAP for Yandex/Mail.ru/Outlook/custom), extract tasks/agreements/important info from emails in real-time.
+Monitor multiple email accounts (Gmail/Google Workspace, Yandex, Mail.ru, Outlook, IMAP), extract tasks/agreements/important info from emails in real-time.
 
 ## When to use
 
@@ -14,8 +14,8 @@ Use this skill when the user asks to:
 ## Prerequisites
 
 - Node.js v18+
-- For Gmail: Google Cloud project with Gmail API enabled + OAuth credentials (Desktop app type)
-- For IMAP: IMAP access enabled in mail settings + app password if 2FA is on
+- For Gmail/Google Workspace: IMAP enabled in settings + app password (recommended)
+- For other IMAP providers: IMAP enabled + password or app password
 
 ---
 
@@ -36,17 +36,31 @@ npm run auth
 This launches a wizard that:
 1. Asks for email address
 2. Auto-detects the mail provider
-3. For Gmail: offers OAuth (recommended) or IMAP with app password
-4. For others: configures IMAP with auto-detected settings
-5. Tests the connection
+3. For custom domains (e.g. `user@company.com` on Google Workspace): choose IMAP and enter `imap.gmail.com`
+4. Auto-fills IMAP settings for known providers and tests connection
+5. Saves the account
 
-Google OAuth setup (one-time):
-1. Go to https://console.cloud.google.com/
-2. Create a project → Enable Gmail API
-3. Create OAuth Desktop credentials
-4. Download JSON → save as `data/google-credentials.json`
+### Google / Google Workspace Authentication (Recommended Method: IMAP + App Password)
 
-List accounts:
+This is the simplest and most reliable method for all Gmail accounts, including custom domain Google Workspace accounts (e.g. `user@company.com`).
+
+**Steps:**
+1. Go to https://myaccount.google.com/apppasswords
+2. Sign in with your Google account
+3. Click "Select app" → choose "Mail"
+4. Click "Select device" → choose "Other (Custom name)" → type "Mail Watch"
+5. Click "Generate" → copy the 16-character app password (format: `abcd efgh ijkl mnop`)
+6. Run `npm run auth` → enter email → choose IMAP → paste app password
+
+**For Google Workspace (custom domain like `@company.com`):**
+- Use IMAP host: `imap.gmail.com` (same as regular Gmail)
+- Use the app password generated above
+- Regular password will NOT work if 2FA is enabled (which it usually is on Workspace)
+
+**Important notes:**
+- App password is different from your Google account password
+- If 2FA is not enabled on the Google account, regular password may work
+- IMAP must be enabled in Gmail settings: Settings → Forwarding and POP/IMAP → IMAP Access → Enable IMAP
 ```bash
 npm run auth --list
 ```

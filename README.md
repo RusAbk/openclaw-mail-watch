@@ -4,9 +4,9 @@ Monitor multiple email accounts in real-time, extract tasks/agreements/important
 
 ## What it does
 
-- **Multi-account support**: Connect multiple email accounts (Gmail, Yandex, Mail.ru, Outlook, iCloud, custom IMAP)
-- **Gmail OAuth 2.0**: Secure Gmail access via Google OAuth (no password stored)
-- **IMAP fallback**: Standard IMAP for any mail provider with auto-detected settings
+- **Multi-account support**: Connect multiple email accounts (Gmail, Google Workspace, Yandex, Mail.ru, Outlook, iCloud, custom IMAP)
+- **Gmail via IMAP + App Password**: Simplest auth method — no Google Cloud setup needed
+- **IMAP for all providers**: Standard IMAP with auto-detected settings for known providers
 - **Real-time listener daemon**: Background PM2 daemon polling for new emails every 30s (IMAP IDLE when available)
 - **Information extractor**: Scan and parse emails to extract tasks, agreements, and important information
 - **Task tracking**: Automatically checks if tasks have been completed via email replies
@@ -36,15 +36,24 @@ npm run auth
 
 Interactive wizard will:
 - Ask for your email
-- Auto-detect provider (Gmail, Yandex, Mail.ru, etc.)
-- For Gmail: open browser for OAuth authorization
-- For others: configure IMAP (auto-detected) and test connection
+- Auto-detect provider (Yandex, Mail.ru, Outlook, etc.)
+- For unknown domains (Google Workspace custom): prompts for IMAP host (`imap.gmail.com`)
+- Auto-fills IMAP settings and tests connection
 
-**Gmail OAuth setup** (one-time):
-1. Go to https://console.cloud.google.com/
-2. Create a project → Enable Gmail API
-3. Create OAuth credentials → Desktop app
-4. Download JSON → save as `data/google-credentials.json`
+**Gmail / Google Workspace Authentication:**
+
+The recommended method is IMAP with App Password — no Google Cloud setup needed.
+
+1. Go to https://myaccount.google.com/apppasswords
+2. Sign in with your Google account
+3. Select app: "Mail", Select device: "Other" → "Mail Watch"
+4. Generate → copy the 16-character password
+5. Run `npm run auth` → enter email → choose IMAP → paste app password
+
+For Google Workspace (custom domain like `@company.com`):
+- IMAP host: `imap.gmail.com`
+- Username: your full email
+- Password: the app password generated above
 
 ### 2. Start the Background Daemon
 
@@ -93,12 +102,11 @@ npm run daemon:logs     # View logs
 
 | Provider | Auth | Notes |
 |----------|------|-------|
-| Gmail | OAuth 2.0 (recommended) | Full API access via Google Cloud |
-| Gmail | IMAP | App password if 2FA enabled |
-| Yandex | IMAP | Enable in Настройки → Почтовые программы |
-| Mail.ru | IMAP | Enable in Настройки → Почтовые программы |
-| Outlook/Hotlive | IMAP | May require app password |
-| iCloud | IMAP | App-specific password required |
+| Gmail / Google Workspace | IMAP + App Password | **Recommended.** `imap.gmail.com`, port 993. App password from myaccount.google.com/apppasswords |
+| Yandex | IMAP | `imap.yandex.ru:993`. Enable in Настройки → Почтовые программы |
+| Mail.ru | IMAP | `imap.mail.ru:993`. Enable in Настройки → Почтовые программы |
+| Outlook/Hotmail | IMAP | `outlook.office365.com:993`. May need app password |
+| iCloud | IMAP | `imap.mail.me.com:993`. App-specific password required |
 | Any IMAP | IMAP | Manual host/port/ssl configuration |
 
 ---
