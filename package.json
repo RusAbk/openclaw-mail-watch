@@ -1,0 +1,27 @@
+{
+  "name": "openclaw-mail-watch",
+  "version": "1.0.0",
+  "description": "OpenClaw skill: Multi-email monitor - Gmail (OAuth), IMAP, extract tasks/agreements/important info",
+  "type": "module",
+  "scripts": {
+    "auth": "node src/auth.js",
+    "auth:add": "node src/auth.js --add",
+    "auth:list": "node src/auth.js --list",
+    "auth:remove": "node src/auth.js --remove",
+    "scan": "node src/scan.js",
+    "listen": "node src/listen.js",
+    "check": "node src/check-tasks.js",
+    "daemon:start": "pm2 start src/listen.js --name mail-watch",
+    "daemon:stop": "pm2 stop mail-watch",
+    "daemon:status": "pm2 status mail-watch",
+    "daemon:logs": "pm2 logs mail-watch"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0",
+    "imapflow": "^1.0.164",
+    "mailparser": "^3.7.2",
+    "pm2": "^7.0.1",
+    "open": "^10.1.0",
+    "keytar": "^7.9.0"
+  }
+}
