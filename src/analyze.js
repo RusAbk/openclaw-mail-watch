@@ -63,10 +63,7 @@ function mergeItems(existing, newItems, key) {
  */
 export function formatMessagesForAI(messages) {
     return messages.map((m, i) => {
-        return `[${i + 1}] From: ${m.from} | To: ${m.to} | Subject: ${m.subject} | Date: ${m.date}
-Account: ${m.accountEmail} (${m.accountId})
-Body: ${m.body.slice(0, 3000)}
----`;
+        return "[" + (i + 1) + "] From: " + m.from + " | To: " + m.to + " | Subject: " + m.subject + " | Date: " + m.date + "\nAccount: " + m.accountEmail + " (" + m.accountId + ")\nBody: " + (m.body || "").slice(0, 3000) + "\n---";
     }).join("\n\n");
 }
 
@@ -83,7 +80,6 @@ export function mergeExtracted(data, extracted) {
     if (extracted.important?.length) {
         data.important = mergeItems(data.important, extracted.important, "msgId");
     }
-    // Mark messages as processed
     for (const msg of extracted._processedMessages || []) {
         if (!data.scannedMessageIds) data.scannedMessageIds = {};
         data.scannedMessageIds[msg.id] = true;
@@ -96,17 +92,24 @@ export function mergeExtracted(data, extracted) {
  */
 export function printSummary(data) {
     console.log("\n=== Mail Watch Summary ===");
-    console.log(`Tasks:       ${data.tasks?.length || 0} (${(data.tasks || []).filter(t => t.status === "open").length} open)`);
-    console.log(`Agreements:  ${data.agreements?.length || 0}`);
-    console.log(`Important:   ${data.important?.length || 0}`);
-    console.log(`Last scan:   ${data.lastScan || "never"}`);
-    console.log(`Processed:   ${Object.keys(data.scannedMessageIds || {}).length} messages");
+    var taskCount = data.tasks?.length || 0;
+    var openCount = (data.tasks || []).filter(t => t.status === "open").length;
+    var agrCount = data.agreements?.length || 0;
+    var impCount = data.important?.length || 0;
+    var lastScan = data.lastScan || "never";
+    var procCount = Object.keys(data.scannedMessageIds || {}).length;
+    console.log("Tasks:       " + taskCount + " (" + openCount + " open)");
+    console.log("Agreements:  " + agrCount);
+    console.log("Important:   " + impCount);
+    console.log("Last scan:   " + lastScan);
+    console.log("Processed:   " + procCount + " messages");
     console.log("===========================\n");
 
     if (data.tasks?.length) {
         console.log("Open tasks:");
         for (const t of data.tasks.filter(t => t.status === "open")) {
-            console.log(`  - [${t.msgId || "?"}] ${t.title} (from: ${t.from}, ${t.date})`);
+            var mid = t.msgId || "?";
+            console.log("  - [" + mid + "] " + t.title + " (from: " + t.from + ", " + t.date + ")");
         }
         console.log();
     }
@@ -114,7 +117,8 @@ export function printSummary(data) {
     if (data.agreements?.length) {
         console.log("Agreements:");
         for (const a of data.agreements.slice(-10)) {
-            console.log(`  - [${a.msgId || "?"}] ${a.title}`);
+            var amid = a.msgId || "?";
+            console.log("  - [" + amid + "] " + a.title);
         }
         console.log();
     }
@@ -122,7 +126,8 @@ export function printSummary(data) {
     if (data.important?.length) {
         console.log("Important:");
         for (const imp of data.important.slice(-10)) {
-            console.log(`  - [${imp.msgId || "?"}] ${imp.title}`);
+            var impid = imp.msgId || "?";
+            console.log("  - [" + impid + "] " + imp.title);
         }
         console.log();
     }
@@ -141,7 +146,7 @@ export function prepareAnalysis() {
         return null;
     }
 
-    console.log(`Found ${messages.length} unprocessed message(s).\n`);
+    console.log("Found " + messages.length + " unprocessed message(s).\n");
     return { data, messages };
 }
 
@@ -165,7 +170,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         process.exit(0);
     }
 
-    console.log(`\n=== ${messages.length} New Email(s) to Analyze ===\n`);
+    console.log("\n=== " + messages.length + " New Email(s) to Analyze ===\n");
     console.log(formatMessagesForAI(messages));
     printSummary(data);
 }
