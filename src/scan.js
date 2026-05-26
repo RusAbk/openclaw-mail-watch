@@ -5,6 +5,7 @@
  */
 
 import { listAccounts, getAccount, loadToken } from "./accounts.js";
+import { isPaymentEmail, extractAndSavePayment, printReport } from "./payments.js";
 import { getGmailMessages } from "./gmail-client.js";
 import { getImapMessages } from "./imap-client.js";
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
@@ -76,6 +77,14 @@ async function scanAccount(account, data) {
             data.scannedMessageIds[msg.id] = true;
 
             messages.push(msg);
+
+            // Try to extract payment info
+            if (isPaymentEmail(msg)) {
+                const payment = extractAndSavePayment(msg);
+                if (payment) {
+                    console.log(`    💰 Payment detected: ${payment.bank} | ${payment.amount} ${payment.currency} | ${payment.beneficiary || '?'}`);
+                }
+            }
         }
 
         if (messages.length > 0) {

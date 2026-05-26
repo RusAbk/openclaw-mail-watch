@@ -19,9 +19,9 @@
   "dependencies": {
     "googleapis": "^144.0.0",
     "imapflow": "^1.0.164",
-    "mailparser": "^3.7.2",
-    "pm2": "^7.0.1",
+    "keytar": "^7.9.0",
+    "mailparser": "^3.9.8",
     "open": "^10.1.0",
-    "keytar": "^7.9.0"
+    "pm2": "^7.0.1"
   }
 }
